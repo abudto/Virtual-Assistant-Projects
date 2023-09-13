@@ -1,7 +1,6 @@
-import speech_recognition as sr
-import os
 import pyttsx3
 import pyautogui
+import speech_recognition as sr
 
 # Initialize the text-to-speech engine
 engine = pyttsx3.init()
@@ -14,22 +13,27 @@ def speak(text):
 # Function to execute commands
 def execute_command(command):
     if "open notepad" in command:
-        os.system("start notepad.exe")
+        pyautogui.press('win')
+        pyautogui.write('Notepad', interval=0.25)
+        pyautogui.press('enter')
         speak("Opening Notepad")
     elif "open calculator" in command:
-        os.system("start calc.exe")
+        pyautogui.press('win')
+        pyautogui.write('Calculator', interval=0.25)
+        pyautogui.press('enter')
         speak("Opening Calculator")
     elif "close" in command:
-        os.system("taskkill /f /im notepad.exe")
-        os.system("taskkill /f /im calculator.exe")
+        pyautogui.hotkey('alt', 'f4')
         speak("Closing applications")
-    elif "type" in command:
-        text_to_type = command.split("type")[-1].strip()
-        pyautogui.typewrite(text_to_type)
+    elif command.startswith("type"):
+        text_to_type = command.split("type", 1)[1].strip()
+        pyautogui.write(text_to_type)
         speak(f"Typing: {text_to_type}")
-    elif "search" in command:
-        search_query = command.split("search")[-1].strip()
-        os.system(f"start microsoft-edge:{search_query}")
+    elif command.startswith("search"):
+        search_query = command.split("search", 1)[1].strip()
+        pyautogui.press('win')
+        pyautogui.write(search_query, interval=0.25)
+        pyautogui.press('enter')
         speak(f"Searching for: {search_query}")
     else:
         speak("Sorry, I don't understand that command.")
@@ -53,6 +57,11 @@ if __name__ == "__main__":
     speak("Hello! How can I assist you?")
     
     while True:
-        command = listen_to_user()
-        if command:
-            execute_command(command)
+        user_input = input("Enter a command (or say it aloud): ").lower()
+        
+        if user_input:
+            execute_command(user_input)
+        
+        voice_command = listen_to_user()
+        if voice_command:
+            execute_command(voice_command)
